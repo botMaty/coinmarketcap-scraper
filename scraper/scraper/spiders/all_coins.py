@@ -1,6 +1,6 @@
 import scrapy
 from scrapy_playwright.page import PageMethod
-from scraper.utilis.script import scrolling_script
+from scraper.utils.script import scrolling_script
 
 
 class ScrapingClubSpider(scrapy.Spider):
