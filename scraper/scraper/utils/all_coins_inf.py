@@ -1,12 +1,17 @@
+from pathlib import Path
 import csv
 
+DATA_FILE = Path(__file__).resolve().parents[3] / "data" / "all_coins.csv"
+
 def get_url_by_sym(sym: str) -> str:
-    with open("all_coins.csv", newline='') as csvfile:
+    with DATA_FILE.open(newline="", encoding="utf-8") as csvfile:
         reader = csv.reader(csvfile)
         next(reader, None)
+
         for row in reader:
             if row[1] == sym:
                 return row[2]
+
     return None
 
 if __name__ == "__main__":
