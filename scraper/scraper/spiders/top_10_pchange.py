@@ -1,5 +1,4 @@
 import scrapy
-import time
 from scrapy_playwright.page import PageMethod
 
 
