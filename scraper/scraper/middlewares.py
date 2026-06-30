@@ -8,6 +8,8 @@ from scrapy import signals
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
 
+import random
+
 
 class ScraperSpiderMiddleware:
     # Not all methods need to be defined. If a method is not defined,
@@ -98,3 +100,17 @@ class ScraperDownloaderMiddleware:
 
     def spider_opened(self, spider):
         spider.logger.info("Spider opened: %s" % spider.name)
+
+
+class UARotatorMiddleware:
+    def __init__(self, user_agents):
+        self.user_agents = user_agents
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        user_agents = crawler.settings.get('USER_AGENTS', [])
+        return cls(user_agents)
+
+    def process_request(self, request, spider):
+        user_agent = random.choice(self.user_agents)
+        request.headers['User-Agent'] = user_agent
