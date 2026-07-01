@@ -9,3 +9,6 @@ class ListCollector:
 
     def spider_closed(self, spider, reason):
         print("Spider finished")
+
+    def spider_error(self, failure, response, spider):
+        print(failure)
