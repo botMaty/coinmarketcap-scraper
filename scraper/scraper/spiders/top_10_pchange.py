@@ -13,7 +13,7 @@ usefull_time_to_num = {
 }
 
 
-class ScrapingClubSpider(scrapy.Spider):
+class Top10PChangeSpider(scrapy.Spider):
     name = "top_10_pchange"
     allowed_domains = ["coinmarketcap.com"]
 

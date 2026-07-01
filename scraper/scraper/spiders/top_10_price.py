@@ -2,7 +2,7 @@ import scrapy
 from scrapy_playwright.page import PageMethod
 
 
-class ScrapingClubSpider(scrapy.Spider):
+class Top10PriceSpider(scrapy.Spider):
     name = "top_10_price"
     allowed_domains = ["coinmarketcap.com"]
 

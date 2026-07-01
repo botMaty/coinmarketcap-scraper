@@ -3,7 +3,7 @@ from scrapy_playwright.page import PageMethod
 from scraper.utils.script import scrolling_script
 
 
-class ScrapingClubSpider(scrapy.Spider):
+class AllCoinsSpider(scrapy.Spider):
     name = "all_coins"
     allowed_domains = ["coinmarketcap.com"]
 
