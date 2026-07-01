@@ -7,10 +7,16 @@ class AllCoinsSpider(scrapy.Spider):
     name = "all_coins"
     allowed_domains = ["coinmarketcap.com"]
 
-    start_urls = [
-        f"https://coinmarketcap.com/?page={x}"
-        for x in range(1, 82)
-    ]
+
+
+    def __init__(self, to_page=81, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.to_page = max(1, to_page)
+        self.start_urls = [
+            f"https://coinmarketcap.com/?page={x}"
+            for x in range(1, to_page + 1)
+        ]
 
     def start_requests(self):
         for url in self.start_urls:

@@ -7,9 +7,13 @@ class SearchForCoinSpider(scrapy.Spider):
     name = "search_for_coin"
     allowed_domains = ["coinmarketcap.com"]
 
-    start_urls = [
-        f"https://coinmarketcap.com" + get_url_by_sym("TRX")
-    ]
+    def __init__(self, symbol=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.symbol = symbol
+        self.start_urls = [
+            "https://coinmarketcap.com" + get_url_by_sym(self.symbol)
+        ]
 
     def start_requests(self):
         for url in self.start_urls:

@@ -6,9 +6,12 @@ class Top10PriceSpider(scrapy.Spider):
     name = "top_10_price"
     allowed_domains = ["coinmarketcap.com"]
 
-    start_urls = [
-        "https://coinmarketcap.com"
-    ]
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.start_urls =[
+            "https://coinmarketcap.com"
+        ]
 
     def start_requests(self):
         for url in self.start_urls:

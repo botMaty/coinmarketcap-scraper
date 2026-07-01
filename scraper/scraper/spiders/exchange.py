@@ -6,9 +6,16 @@ class ExchangeSpider(scrapy.Spider):
     name = "exchange"
     allowed_domains = ["coinmarketcap.com"]
 
-    start_urls = [
-        "https://coinmarketcap.com/converter/"
-    ]
+
+
+    def __init__(self, from_coin=None, to_coin=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.from_coin = from_coin
+        self.to_coin = to_coin
+        self.start_urls = [
+            "https://coinmarketcap.com/converter/"
+        ]
 
     def start_requests(self):
         for url in self.start_urls:
@@ -20,11 +27,11 @@ class ExchangeSpider(scrapy.Spider):
                     PageMethod("click", 'div.cmc-body-wrapper input[type="number"]'),
                     PageMethod("fill", 'div.cmc-body-wrapper input[type="number"]', "1"),
                     # PageMethod("click", 'div.cmc-body-wrapper div.cmc-select__value-container'),
-                    PageMethod("fill", 'div.cmc-body-wrapper input[id="react-select-cmc-select__from-input"]', "eth"),
+                    PageMethod("fill", 'div.cmc-body-wrapper input[id="react-select-cmc-select__from-input"]', self.from_coin),
                     # PageMethod("wait_for_selector", 'div.cmc-body-wrapper div.cmc-select__group div.cmc-select__option'),
                     PageMethod("click", 'div.cmc-body-wrapper div.cmc-select__group div.cmc-select__option'),
                     # PageMethod("click", 'div.cmc-body-wrapper div.cmc-converter div + div div:nth-child(3) div.cmc-select__value-container'),
-                    PageMethod("fill", 'div.cmc-body-wrapper input[id="react-select-cmc-select__to-input"]', "leo"),
+                    PageMethod("fill", 'div.cmc-body-wrapper input[id="react-select-cmc-select__to-input"]', self.to_coin),
                     # PageMethod("wait_for_selector", 'div.cmc-body-wrapper div.cmc-select__group div.cmc-select__option'),
                     PageMethod("click", 'div.cmc-body-wrapper div.cmc-select__group div.cmc-select__option'),
                     PageMethod("wait_for_selector", 'em.cmc-converter__conversion-result'),
@@ -39,12 +46,12 @@ class ExchangeSpider(scrapy.Spider):
 
         response = response.replace(body=html)
 
-        from_coin = " ".join(t.strip() for t in response.css(
+        from_coin_res = " ".join(t.strip() for t in response.css(
             "div.cmc-converter div.converter__text-row div::text"
             ).getall()[:2] if t.strip())
 
         yield {
-            "FromCoin": from_coin,
+            "FromCoin": from_coin_res,
             "ToCoin": (response.css("em.cmc-converter__conversion-result::text").get() or "") + (response.css("div.cmc-converter div.converter__text-row div + div + div::text").get() or ""),
             }
         
