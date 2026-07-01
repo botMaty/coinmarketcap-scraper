@@ -1,7 +1,7 @@
 from pathlib import Path
 import csv
 
-DATA_FILE = Path(__file__).resolve().parents[3] / "data" / "all_coins.csv"
+DATA_FILE = Path(__file__).resolve().parents[2] / "data" / "all_coins.csv"
 
 def get_url_by_sym(sym: str) -> str:
     with DATA_FILE.open(newline="", encoding="utf-8") as csvfile:
