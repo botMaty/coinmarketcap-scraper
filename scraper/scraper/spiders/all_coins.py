@@ -1,6 +1,6 @@
 import scrapy
 from scrapy_playwright.page import PageMethod
-from scraper.utils.script import scrolling_script
+from utils.script import scrolling_script
 
 
 class AllCoinsSpider(scrapy.Spider):
@@ -12,10 +12,10 @@ class AllCoinsSpider(scrapy.Spider):
     def __init__(self, to_page=81, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.to_page = max(1, to_page)
+        self.to_page = max(1, int(to_page))
         self.start_urls = [
             f"https://coinmarketcap.com/?page={x}"
-            for x in range(1, to_page + 1)
+            for x in range(1, self.to_page + 1)
         ]
 
     def start_requests(self):

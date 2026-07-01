@@ -1,14 +1,21 @@
 scrolling_script = """
-const numScrolls = -1
-let scrollCount = 0
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-// scroll down and then wait for 0.5s
-const scrollInterval = setInterval(() => {
-    window.scrollTo(0, document.body.scrollHeight)
-    scrollCount++
+(async () => {
+    let lastHeight = 0;
 
-    if (scrollCount === numScrolls) {
-    clearInterval(scrollInterval)
+    while (true) {
+        window.scrollTo(0, document.body.scrollHeight);
+
+        await delay(500);
+
+        const newHeight = document.body.scrollHeight;
+
+        if (newHeight === lastHeight) {
+            break;
+        }
+
+        lastHeight = newHeight;
     }
-}, 500)
+})();
 """
