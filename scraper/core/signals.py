@@ -7,11 +7,6 @@ def connect(crawler, collector):
     )
 
     crawler.signals.connect(
-        collector.spider_closed,
-        signal=signals.spider_closed,
-    )
-
-    crawler.signals.connect(
         collector.spider_error,
         signal=signals.spider_error,
     )

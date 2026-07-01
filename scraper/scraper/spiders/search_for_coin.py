@@ -1,6 +1,6 @@
 import scrapy
 from scrapy_playwright.page import PageMethod
-from utils.all_coins_inf import get_url_by_sym
+from scraper.utils.all_coins_inf import get_url_by_sym
 
 
 class SearchForCoinSpider(scrapy.Spider):

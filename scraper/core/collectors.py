@@ -1,14 +1,21 @@
-from scrapy import signals
+from .result import CrawlResult
+
 
 class ListCollector:
+
     def __init__(self):
-        self.items = []
+        self.results: list[CrawlResult] = []
 
     def item_scraped(self, item, response, spider):
-        self.items.append(dict(item))
-
-    def spider_closed(self, spider, reason):
-        print("Spider finished")
+        self.results.append(
+            CrawlResult(
+                item=dict(item),
+            )
+        )
 
     def spider_error(self, failure, response, spider):
-        print(failure)
+        self.results.append(
+            CrawlResult(
+                error=failure,
+            )
+        )

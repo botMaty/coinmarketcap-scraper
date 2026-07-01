@@ -1,6 +1,6 @@
 import scrapy
 from scrapy_playwright.page import PageMethod
-from utils.script import scrolling_script
+from scraper.utils.script import scrolling_script
 
 
 class AllCoinsSpider(scrapy.Spider):
