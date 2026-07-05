@@ -19,7 +19,7 @@ class Top10PriceSpider(scrapy.Spider):
                 "playwright": True,
                 "playwright_include_page": True,
                 "playwright_page_methods": [
-                    PageMethod("wait_for_load_state", "networkidle"),
+                    # PageMethod("wait_for_load_state", "networkidle"),
                     PageMethod("click", 'div[aria-orientation="horizontal"] div div:nth-child(2) button'),
                     PageMethod("wait_for_selector", 'div.modal-body-wrapper div[data-role="select-trigger"]'),
                     PageMethod("click", 'div.modal-body-wrapper div[data-role="select-trigger"]'),
@@ -34,6 +34,7 @@ class Top10PriceSpider(scrapy.Spider):
             })
 
     async def parse(self, response):
+        print("\n\n\ntoooof\n\n\n")
         page = response.meta["playwright_page"]
 
         html = await page.content()
@@ -52,6 +53,3 @@ class Top10PriceSpider(scrapy.Spider):
             }
 
         await page.close()
-
-
-# div.modal-body-wrapper

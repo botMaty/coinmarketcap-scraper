@@ -1,6 +1,6 @@
 import scrapy
 from scrapy_playwright.page import PageMethod
-from utils.script import scrolling_script
+from scraper.utils.script import scrolling_script
 
 
 class AllCoinsSpider(scrapy.Spider):
@@ -18,7 +18,7 @@ class AllCoinsSpider(scrapy.Spider):
             for x in range(1, self.to_page + 1)
         ]
 
-    def start_requests(self):
+    async def start(self):
         for url in self.start_urls:
             yield scrapy.Request(url, meta={
                 "playwright": True,

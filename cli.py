@@ -1,4 +1,4 @@
-from scraper.core.runner import ScraperProcessRunner
+from scraper.core.runner import ScraperRunner
 
 from scraper.scraper.spiders.search_for_coin import SearchForCoinSpider
 from scraper.scraper.spiders.top_10_price import Top10PriceSpider
@@ -27,34 +27,56 @@ options = [
 ]
 
 
-def search_for_coin():
-    pass
+def search_for_coin(runner: ScraperRunner):
+    symbol = input("Coin symbol: ")
+    coin = runner.submit(
+        SearchForCoinSpider,
+        symbol=symbol
+    )
+    coin.wait()
+    print(coin.result())
 
-def top_10_by_price():
-    pass
+def top_10_by_price(runner: ScraperRunner):
+    coins = runner.submit(Top10PriceSpider)
+    coins.wait()
+    print(coins.result())
 
-def top_10_by_price_change():
-    pass
+def top_10_by_price_change(runner: ScraperRunner):
+    tdomain = input("Time range (1h/24h/7d): ")
+    coins = runner.submit(
+        Top10PriceSpider,
+        tdomain=tdomain,
+    )
+    print(coins.result())
 
-def exchange():
-    pass
 
-def menu(options):
+def exchange(runner: ScraperRunner):
+    from_coin = input("From Coin: ")
+    to_coin = input("To Coin: ")
+    res = runner.submit(
+        ExchangeSpider,
+        from_coin=from_coin,
+        to_coin=to_coin,
+    )
+    print(res.result())
+
+def menu(options, runner: ScraperRunner):
     while True:
         choice = TerminalMenu(options, title="Select your operation:").show()
 
         if choice == 0:
-            search_for_coin()
+            search_for_coin(runner)
         elif choice == 1:
-            top_10_by_price()
+            top_10_by_price(runner)
         elif choice == 2:
-            top_10_by_price_change()
+            top_10_by_price_change(runner)
         elif choice == 3:
-            exchange()
+            exchange(runner)
         else:
             break
 
-        TerminalMenu(["Press Enter..."]).show()
+        # TerminalMenu(["Press Enter..."]).show()
+        input("Press Enter...")
 
 def show_banner(banner: str):
     for char in banner:
@@ -66,8 +88,11 @@ def main():
     global banner
     global options
 
+    runner = ScraperRunner()
+
     show_banner(banner)
-    menu(options)
+    menu(options, runner)
+    runner.shutdown
 
 if __name__ == "__main__":
     main()

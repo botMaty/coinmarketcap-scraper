@@ -1,52 +1,66 @@
-from scrapy.crawler import CrawlerRunner, CrawlerProcess
-from scrapy.utils.project import get_project_settings
+from scrapy.utils.reactor import install_reactor
+
+install_reactor("twisted.internet.asyncioreactor.AsyncioSelectorReactor")
+
+import threading
+
+from twisted.internet import reactor
+
+from scrapy.crawler import CrawlerRunner
+from scrapy.settings import Settings
+
+from scraper.scraper import settings as project_settings
 
 from .collectors import ListCollector
 from .signals import connect
+from .job import CrawlJob
+
+
+settings = Settings()
+settings.setmodule(project_settings)
 
 
 class ScraperRunner:
 
     def __init__(self):
-        self.runner = CrawlerRunner(get_project_settings())
+        self.runner = CrawlerRunner(settings)
 
-    def run(self, spider_cls, **kwargs):
-        collector = ListCollector()
+        self._reactor_thread = threading.Thread(
+            target=reactor.run,
+            kwargs={
+                "installSignalHandlers": False,
+            },
+            daemon=True,
+        )
+
+        self._reactor_thread.start()
+
+    def submit(self, spider_cls, **kwargs):
+
+        job = CrawlJob()
+
+        collector = ListCollector(job)
 
         crawler = self.runner.create_crawler(spider_cls)
 
         connect(crawler, collector)
 
-        d = self.runner.crawl(crawler, **kwargs)
+        def _crawl():
+            d = self.runner.crawl(crawler, **kwargs)
 
-        return d, collector.results
+            def finished(_):
+                job._done.set()
 
+            def failed(failure):
+                job.exception = failure
+                job._done.set()
 
-class ScraperProcessRunner:
+            d.addCallbacks(finished, failed)
 
-    def __init__(self):
-        self.settings = get_project_settings()
-        self.process = CrawlerProcess(self.settings)
-        self.spider_count = 0
+        reactor.callFromThread(_crawl)
 
-    def add(self, spider_cls, **kwargs):
-        collector = ListCollector()
-
-        crawler = self.process.create_crawler(spider_cls)
-
-        connect(crawler, collector)
-
-        self.process.crawl(crawler, **kwargs)
-
-        self.has_spiders += 1
-
-        return collector.results
+        return job
     
-    def start(self):
-        if self.has_spiders == 0:
-            return
-
-        self.process.start()
-
-        self.process = CrawlerProcess(self.settings)
-        self.has_spiders = 0
+    def shutdown(self):
+        reactor.callFromThread(reactor.stop)
+        self._reactor_thread.join()

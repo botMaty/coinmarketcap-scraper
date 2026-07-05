@@ -6,8 +6,6 @@ class ExchangeSpider(scrapy.Spider):
     name = "exchange"
     allowed_domains = ["coinmarketcap.com"]
 
-
-
     def __init__(self, from_coin=None, to_coin=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -53,6 +51,6 @@ class ExchangeSpider(scrapy.Spider):
         yield {
             "FromCoin": from_coin_res,
             "ToCoin": (response.css("em.cmc-converter__conversion-result::text").get() or "") + (response.css("div.cmc-converter div.converter__text-row div + div + div::text").get() or ""),
-            }
+        }
         
         await page.close()

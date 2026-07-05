@@ -33,7 +33,6 @@ class SearchForCoinSpider(scrapy.Spider):
 
         response = response.replace(body=html)
 
-        
         yield {
             "Name": response.css('span[data-role="coin-name"]::text').get(),
             "Price": response.css('span[data-test="text-cdp-price-display"]::text').get(),

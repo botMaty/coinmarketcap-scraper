@@ -9,8 +9,8 @@
 
 BOT_NAME = "scraper"
 
-SPIDER_MODULES = ["scraper.spiders"]
-NEWSPIDER_MODULE = "scraper.spiders"
+SPIDER_MODULES = ["scraper.scraper.spiders"]
+NEWSPIDER_MODULE = "scraper.scraper.spiders"
 
 ADDONS = {}
 
@@ -54,8 +54,8 @@ COOKIES_ENABLED = False
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-   "scraper.middlewares.ScraperDownloaderMiddleware": 543,
-   "scraper.middlewares.UARotatorMiddleware": 400,
+   "scraper.scraper.middlewares.ScraperDownloaderMiddleware": 543,
+   "scraper.scraper.middlewares.UARotatorMiddleware": 400,
 }
 
 # Enable or disable extensions
@@ -67,7 +67,7 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 #ITEM_PIPELINES = {
-#    "scraper.pipelines.ScraperPipeline": 300,
+#   "scraper.scraper.pipelines.ScraperPipeline": 300,
 #}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -108,3 +108,5 @@ PLAYWRIGHT_LAUNCH_OPTIONS = {
     "headless": False,
 } 
 PLAYWRIGHT_BROWSER_TYPE = "chromium"
+
+LOG_LEVEL = "ERROR"
