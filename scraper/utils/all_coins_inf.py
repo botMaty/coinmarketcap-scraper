@@ -14,5 +14,16 @@ def get_url_by_sym(sym: str) -> str:
 
     return None
 
+def get_all_coins_sym() -> list[str]:
+    syms = []
+    with DATA_FILE.open(newline="", encoding="utf-8") as csvfile:
+        reader = csv.reader(csvfile)
+        next(reader, None)
+
+        for row in reader:
+            syms.append(row[1])
+
+    return syms
+
 if __name__ == "__main__":
     print(get_url_by_sym("BTC"))
