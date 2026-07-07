@@ -19,3 +19,13 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
     }
 })();
 """
+
+
+text_message = """
+() => {
+    const div = document.createElement('div');
+    div.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:red;color:white;padding:20px;font-size:24px;text-align:center;z-index:9999;';
+    div.textContent = 'test message';
+    document.body.prepend(div);
+}
+"""

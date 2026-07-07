@@ -44,7 +44,7 @@ def top_10_by_price(runner: ScraperRunner):
 def top_10_by_price_change(runner: ScraperRunner):
     tdomain = input("Time range (1h/24h/7d): ")
     coins = runner.submit(
-        Top10PriceSpider,
+        Top10PChangeSpider,
         tdomain=tdomain,
     )
     print(coins.result())

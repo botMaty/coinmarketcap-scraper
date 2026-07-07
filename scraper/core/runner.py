@@ -39,28 +39,54 @@ class ScraperRunner:
 
         job = CrawlJob()
 
+        try:
+            spider_cls(**kwargs)
+        except Exception as e:
+            job.exception = e
+            job.reason = "error"
+            job._done.set()
+            return job
+
         collector = ListCollector(job)
 
-        crawler = self.runner.create_crawler(spider_cls)
-
-        connect(crawler, collector)
-
         def _crawl():
-            d = self.runner.crawl(crawler, **kwargs)
+            try:
+                crawler = self.runner.create_crawler(spider_cls)
+
+                job.crawler = crawler
+
+                connect(crawler, collector)
+
+                d = self.runner.crawl(crawler, **kwargs)
+
+            except Exception as e:
+                job.exception = e
+                job.reason = "error"
+                job.crawler = None
+
+                if not job.done():
+                    job._done.set()
+
+                return
 
             def finished(_):
-                job._done.set()
+                job.crawler = None
+                return _
 
             def failed(failure):
-                job.exception = failure
-                job._done.set()
+                if job.exception is None:
+                    job.exception = failure
+
+                job.crawler = None
+
+                return failure
 
             d.addCallbacks(finished, failed)
 
         reactor.callFromThread(_crawl)
 
         return job
-    
+
     def shutdown(self):
         reactor.callFromThread(reactor.stop)
         self._reactor_thread.join()

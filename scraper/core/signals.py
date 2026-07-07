@@ -16,8 +16,13 @@ def connect(crawler, collector):
     )
 
     def closed(spider, reason):
-        collector.job.reason = reason
-        collector.job._done.set()
+        job = collector.job
+
+        job.reason = reason
+        job.crawler = None
+
+        if not job.done():
+            job._done.set()
 
     crawler.signals.connect(
         closed,

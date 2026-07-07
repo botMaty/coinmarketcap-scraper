@@ -22,13 +22,16 @@ class Top10PChangeSpider(scrapy.Spider):
         ]
 
     def start_requests(self):
+        print(self.tdomain_num)
         for url in self.start_urls:
             yield scrapy.Request(url, meta={
                 "playwright": True,
                 "playwright_include_page": True,
                 "playwright_page_methods": [
-                    # PageMethod("wait_for_load_state", "networkidle"),
-                    PageMethod("click", 'div[aria-orientation="horizontal"] div div:nth-child(2) button'),
+                    PageMethod("wait_for_load_state", "networkidle"),
+                    PageMethod("wait_for_selector", 'div[aria-orientation="horizontal"] div div + div div[data-role="btn-content"]'),
+                    # PageMethod("wait_for_timeout", 200),
+                    PageMethod("click", 'div[aria-label="Scrollable content area"] + div div div:nth-child(2) button'),
                     PageMethod("wait_for_selector", 'div.modal-body-wrapper div[data-role="select-trigger"]'),
                     PageMethod("click", 'div.modal-body-wrapper div[data-role="select-trigger"]'),
                     PageMethod("wait_for_selector", 'div.modal-body-wrapper div[data-role="select-trigger"]'),
@@ -42,7 +45,6 @@ class Top10PChangeSpider(scrapy.Spider):
             })
 
     async def parse(self, response):
-        print("before yield")
         page = response.meta["playwright_page"]
 
         html = await page.content()

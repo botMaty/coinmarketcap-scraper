@@ -1,3 +1,5 @@
+from twisted.internet import reactor
+
 from .result import CrawlResult
 
 
@@ -20,4 +22,12 @@ class ListCollector:
             )
         )
 
-        self.job.exception = failure
+        if self.job.exception is None:
+            self.job.exception = failure
+
+        # Fail Fast
+        reactor.callFromThread(
+            spider.crawler.engine.close_spider,
+            spider,
+            reason="error",
+        )
