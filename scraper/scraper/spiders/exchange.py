@@ -20,25 +20,35 @@ class ExchangeSpider(scrapy.Spider):
             yield scrapy.Request(url, meta={
                 "playwright": True,
                 "playwright_include_page": True,
-                "playwright_page_methods": [
-                    PageMethod("wait_for_load_state", "networkidle"),
-                    PageMethod("click", 'div.cmc-body-wrapper input[type="number"]'),
-                    PageMethod("fill", 'div.cmc-body-wrapper input[type="number"]', "1"),
-                    # PageMethod("click", 'div.cmc-body-wrapper div.cmc-select__value-container'),
-                    PageMethod("fill", 'div.cmc-body-wrapper input[id="react-select-cmc-select__from-input"]', self.from_coin),
-                    # PageMethod("wait_for_selector", 'div.cmc-body-wrapper div.cmc-select__group div.cmc-select__option'),
-                    PageMethod("click", 'div.cmc-body-wrapper div.cmc-select__group div.cmc-select__option'),
-                    # PageMethod("click", 'div.cmc-body-wrapper div.cmc-converter div + div div:nth-child(3) div.cmc-select__value-container'),
-                    PageMethod("fill", 'div.cmc-body-wrapper input[id="react-select-cmc-select__to-input"]', self.to_coin),
-                    # PageMethod("wait_for_selector", 'div.cmc-body-wrapper div.cmc-select__group div.cmc-select__option'),
-                    PageMethod("click", 'div.cmc-body-wrapper div.cmc-select__group div.cmc-select__option'),
-                    PageMethod("wait_for_selector", 'em.cmc-converter__conversion-result'),
-                    # PageMethod("wait_for_timeout", 2000),
-                ],
+                "playwright_page_goto_kwargs": {
+                    "wait_until": "networkidle",
+                },
             })
 
     async def parse(self, response):
         page = response.meta["playwright_page"]
+
+        inp = page.locator('div.cmc-body-wrapper input[type="number"]')
+        await inp.wait_for()
+        await inp.fill("1")
+
+        inp = page.locator("#react-select-cmc-select__from-input")
+        await inp.wait_for()
+        await inp.fill(self.from_coin)
+
+        loc = page.locator('div.cmc-body-wrapper div.cmc-select__group div.cmc-select__option').nth(0)
+        await loc.wait_for()
+        await loc.click()
+
+        inp = page.locator("#react-select-cmc-select__to-input")
+        await inp.wait_for()
+        await inp.fill(self.to_coin)
+
+        loc = page.locator('div.cmc-body-wrapper div.cmc-select__group div.cmc-select__option').nth(0)
+        await loc.wait_for()
+        await loc.click()
+
+        await page.locator('em.cmc-converter__conversion-result').nth(0).wait_for()
 
         html = await page.content()
 

@@ -18,25 +18,31 @@ class Top10PriceSpider(scrapy.Spider):
             yield scrapy.Request(url, meta={
                 "playwright": True,
                 "playwright_include_page": True,
-                "playwright_page_methods": [
-                    # PageMethod("wait_for_load_state", "networkidle"),
-                    PageMethod("wait_for_selector", 'div[aria-orientation="horizontal"] div div + div div[data-role="btn-content"]'),
-                    # PageMethod("wait_for_timeout", 200),
-                    PageMethod("click", 'div[aria-orientation="horizontal"] div div:nth-child(2) button'),
-                    PageMethod("wait_for_selector", 'div.modal-body-wrapper div[data-role="select-trigger"]'),
-                    PageMethod("click", 'div.modal-body-wrapper div[data-role="select-trigger"]'),
-                    PageMethod("wait_for_selector", 'div.modal-body-wrapper div[data-role="select-trigger"]'),
-                    PageMethod("click", 'div[data-role="pp-item"] div div:nth-child(4)'),
-                    PageMethod("click", 'div.modal-body-wrapper + div button:nth-child(2)'),
-                    PageMethod("wait_for_selector", 'th.stickyTop'),
-                    PageMethod("click", 'th.stickyTop:nth-of-type(4) div div'),
-                    PageMethod("wait_for_selector", 'th.stickyTop:nth-of-type(4) div div [data-direction="desc"]'),
-                    PageMethod("wait_for_timeout", 2000),
-                ],
+                "playwright_page_goto_kwargs": {
+                    "wait_until": "domcontentloaded",
+                },
             })
 
     async def parse(self, response):
         page = response.meta["playwright_page"]
+
+        btn = page.get_by_role("button", name="Filters")
+        await btn.wait_for()
+        await btn.click()
+
+        loc = page.locator("div.form-item").nth(0)
+        await loc.wait_for()
+        await loc.locator('div[data-role="select-trigger"]').click()
+
+        loc = page.locator('div[data-role="pp-item"] > div > div').nth(3)
+        await loc.wait_for()
+        await loc.click()
+
+        await page.get_by_role("button", name="Apply").click()
+
+        await page.locator("th.stickyTop").nth(3).click()
+
+        await page.wait_for_timeout(2000)
 
         html = await page.content()
 

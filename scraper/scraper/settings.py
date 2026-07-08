@@ -104,9 +104,11 @@ TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 
 
 # Optional:
-PLAYWRIGHT_LAUNCH_OPTIONS = {
-    "headless": False,
-} 
+# PLAYWRIGHT_LAUNCH_OPTIONS = {
+#     "headless": False,
+# } 
 PLAYWRIGHT_BROWSER_TYPE = "chromium"
+
+PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT = 10000
 
 LOG_LEVEL = "ERROR"

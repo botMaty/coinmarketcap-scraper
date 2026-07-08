@@ -20,16 +20,17 @@ class SearchForCoinSpider(scrapy.Spider):
             yield scrapy.Request(url, meta={
                 "playwright": True,
                 "playwright_include_page": True,
-                "playwright_page_methods": [
-                    # PageMethod("wait_for_load_state", "networkidle"),
-                    PageMethod("wait_for_selector", 'span[data-test="text-cdp-price-display"]'),
-                ],
+                # "playwright_page_goto_kwargs": {
+                #     "wait_until": "domcontentloaded",
+                # },
             })
 
     async def parse(self, response):
         page = response.meta["playwright_page"]
 
         html = await page.content()
+
+        await page.locator('span[data-test="text-cdp-price-display"]').nth(0).wait_for()
 
         response = response.replace(body=html)
 
