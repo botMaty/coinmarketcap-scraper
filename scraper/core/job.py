@@ -1,7 +1,6 @@
 from threading import Event
 
 from twisted.internet import reactor
-from twisted.python.failure import Failure
 
 
 class CrawlJob:
@@ -44,13 +43,11 @@ class CrawlJob:
         return True
 
     def result(self, timeout=None):
+
         if not self.wait(timeout):
             raise TimeoutError("Crawler did not finish.")
 
-        if self.exception:
-            if isinstance(self.exception, Failure):
-                self.exception.raiseException()
-
+        if self.exception is not None:
             raise self.exception
 
         return self.results

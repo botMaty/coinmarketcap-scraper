@@ -1,13 +1,10 @@
 # Core
 
-The `core/` package provides a lightweight wrapper around Scrapy's
-`CrawlerRunner`.
+The `core/` package provides a lightweight wrapper around Scrapy's `CrawlerRunner`.
 
-Its purpose is to expose a simple and synchronous-looking API while internally
-using Scrapy and Twisted asynchronously.
+Its purpose is to expose a simple and synchronous-looking API while internally using Scrapy and Twisted asynchronously.
 
-The application never interacts with Scrapy directly. Instead, all crawl
-requests are submitted through `ScraperRunner`.
+The application never interacts with Scrapy directly. Instead, all crawl requests are submitted through `ScraperRunner`.
 
 ---
 
@@ -17,7 +14,7 @@ requests are submitted through `ScraperRunner`.
 
 `ScraperRunner` is the entry point of the framework.
 
-Responsibilities:
+### Responsibilities
 
 - Owns a single `CrawlerRunner`
 - Starts the Twisted Reactor
@@ -26,7 +23,7 @@ Responsibilities:
 - Schedules crawling safely on the Reactor thread
 - Stops the Reactor during application shutdown
 
-Example:
+### Example
 
 ```python
 runner = ScraperRunner()
@@ -47,16 +44,17 @@ print(job.result())
 
 Each submitted spider returns a `CrawlJob`.
 
-A `CrawlJob` represents one crawling task and contains everything related to
-that execution.
+A `CrawlJob` represents one crawling task and contains everything related to that execution.
 
-Stored information:
+### Stored information
 
-- collected results
-- crawl exception
-- finish reason
-- crawler instance
-- completion state
+- Collected results
+- Crawl exception
+- Finish reason
+- Crawler instance
+- Completion state
+
+---
 
 ### wait()
 
@@ -66,9 +64,10 @@ job.wait(timeout=None)
 
 Blocks the current thread until the crawl finishes.
 
-Returns `True` if the crawl completed before the timeout.
+Returns:
 
-Returns `False` if the timeout expired.
+- `True` if the crawl completed before the timeout.
+- `False` if the timeout expired.
 
 If `timeout` is omitted, it waits indefinitely.
 
@@ -80,9 +79,10 @@ If `timeout` is omitted, it waits indefinitely.
 job.done()
 ```
 
-Returns `True` if the crawl has already finished.
+Returns:
 
-Returns `False` while the spider is still running.
+- `True` if the crawl has already finished.
+- `False` while the spider is still running.
 
 This method never blocks.
 
@@ -123,7 +123,7 @@ crawler.engine.close_spider(...)
 
 If the spider has already finished, this method has no effect.
 
-The crawl will eventually complete normally and `wait()` will return.
+The crawl will eventually complete and `wait()` will return.
 
 ---
 
@@ -133,11 +133,9 @@ The crawl will eventually complete normally and `wait()` will return.
 job.result()
 ```
 
-Waits for the crawl to finish and returns all collected `CrawlResult`
-instances.
+Waits for the crawl to finish and returns the collected items.
 
-If an exception occurred before or during crawler startup, the stored exception
-is raised instead.
+If an exception occurred before or during crawler execution, the stored exception is raised.
 
 Example:
 
@@ -148,35 +146,85 @@ for item in results:
     print(item)
 ```
 
+`result()` follows the same behavior as `concurrent.futures.Future.result()`:
+
+- waits for completion
+- raises stored exceptions
+- returns successful results
+
 ---
 
-## CrawlResult
+## Results and Exceptions
 
-Each collected item or spider error is wrapped inside a `CrawlResult`.
+Crawl results are stored directly inside `CrawlJob.results`.
 
-This provides a consistent result type regardless of whether the crawl produced
-data or failed.
+Example:
 
-A `CrawlResult` may contain:
+```python
+job.results
+```
 
-- a scraped item
-- a spider exception
+contains:
+
+```python
+[
+    {
+        "title": "Example",
+        "price": 100,
+    },
+    {
+        "title": "Another Item",
+        "price": 200,
+    }
+]
+```
+
+Errors are stored separately:
+
+```python
+job.exception
+```
+
+Example:
+
+```python
+if job.exception:
+    print(job.exception)
+```
+
+A failed crawl does **not** add error objects into `results`.
+
+The separation is intentional:
+
+- `results` contains successful scraped data
+- `exception` contains execution failures
 
 ---
 
 ## ListCollector
 
-The collector receives Scrapy signals and stores results inside the associated
-`CrawlJob`.
+The collector receives Scrapy signals and stores results inside the associated `CrawlJob`.
 
-Responsibilities:
+### Responsibilities
 
-- collect scraped items
-- collect spider errors
+- Collect scraped items
+- Report spider errors
 
 The collector never starts, stops, or controls spiders.
 
 It only transfers Scrapy events into the corresponding `CrawlJob`.
+
+Scraped items are appended directly:
+
+```python
+job.results.append(item)
+```
+
+Spider failures are stored:
+
+```python
+job.exception = error
+```
 
 ---
 
@@ -190,12 +238,11 @@ Current signals:
 - `spider_error`
 - `spider_closed`
 
-These signals keep the external `CrawlJob` synchronized with Scrapy's internal
-execution.
+These signals keep the external `CrawlJob` synchronized with Scrapy's internal execution.
 
 ---
 
-# Twisted Integration
+## Twisted Integration
 
 Scrapy is built on top of Twisted.
 
@@ -209,7 +256,6 @@ Main Thread
 CLI / GUI / API
 
         │
-
         ▼
 
 ScraperRunner.submit()
@@ -219,7 +265,6 @@ ScraperRunner.submit()
 reactor.callFromThread()
 
         │
-
         ▼
 
 Reactor Thread
@@ -235,7 +280,7 @@ The main thread never communicates with Scrapy directly.
 
 ---
 
-# Running Multiple Spiders
+## Running Multiple Spiders
 
 The Runner supports any number of concurrent spiders.
 
@@ -265,21 +310,19 @@ No additional threads are created.
 
 ---
 
-# Runner Lifetime
+## Runner Lifetime
 
 A Python process should create only one `ScraperRunner`.
 
-Although multiple instances can technically be created, they all share the same
-global Reactor.
+Although multiple instances can technically be created, they all share the same global Reactor.
 
 Creating multiple runners is therefore unnecessary and not recommended.
 
-If multiple independent runners are required, use multiple operating system
-processes instead.
+If multiple independent runners are required, use multiple operating system processes instead.
 
 ---
 
-# Memory Management
+## Memory Management
 
 Each crawl creates temporary objects such as:
 
@@ -287,17 +330,15 @@ Each crawl creates temporary objects such as:
 - CrawlJob
 - Collector
 
-Once a crawl finishes and no references remain, Python's garbage collector
-releases them automatically.
+Once a crawl finishes and no references remain, Python's garbage collector releases them automatically.
 
 The Reactor thread remains alive for the lifetime of the application.
 
-Memory usage therefore depends mainly on the number of stored crawl results,
-not on the number of completed spiders.
+Memory usage depends mainly on the number of stored crawl results.
 
 ---
 
-# Shutdown
+## Shutdown
 
 Before the application exits, the Runner should be shut down.
 
@@ -317,12 +358,11 @@ reactor.callFromThread(reactor.stop)
 self._reactor_thread.join()
 ```
 
-This stops the Reactor and waits for the background thread to terminate
-cleanly.
+This stops the Reactor and waits for the background thread to terminate cleanly.
 
 ---
 
-# Typical Workflow
+## Typical Workflow
 
 ```python
 runner = ScraperRunner()
@@ -344,4 +384,4 @@ job = runner.submit(MySpider)
 print(job.result())
 ```
 
-since `result()` automatically waits for completion.
+because `result()` automatically waits for completion and raises failures.

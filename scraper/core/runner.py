@@ -38,21 +38,11 @@ class ScraperRunner:
     def submit(self, spider_cls, **kwargs):
 
         job = CrawlJob()
-
-        try:
-            spider_cls(**kwargs)
-        except Exception as e:
-            job.exception = e
-            job.reason = "error"
-            job._done.set()
-            return job
-
         collector = ListCollector(job)
 
         def _crawl():
             try:
                 crawler = self.runner.create_crawler(spider_cls)
-
                 job.crawler = crawler
 
                 connect(crawler, collector)
@@ -63,10 +53,7 @@ class ScraperRunner:
                 job.exception = e
                 job.reason = "error"
                 job.crawler = None
-
-                if not job.done():
-                    job._done.set()
-
+                job._done.set()
                 return
 
             def finished(_):
@@ -75,9 +62,13 @@ class ScraperRunner:
 
             def failed(failure):
                 if job.exception is None:
-                    job.exception = failure
+                    job.exception = failure.value
 
+                job.reason = "error"
                 job.crawler = None
+
+                if not job.done():
+                    job._done.set()
 
                 return failure
 

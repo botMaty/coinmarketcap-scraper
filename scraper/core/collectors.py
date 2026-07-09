@@ -1,7 +1,5 @@
 from twisted.internet import reactor
 
-from .result import CrawlResult
-
 
 class ListCollector:
 
@@ -10,22 +8,14 @@ class ListCollector:
 
     def item_scraped(self, item, response, spider):
         self.job.results.append(
-            CrawlResult(
-                item=dict(item),
-            )
+            dict(item)
         )
 
     def spider_error(self, failure, response, spider):
-        self.job.results.append(
-            CrawlResult(
-                error=failure,
-            )
-        )
 
         if self.job.exception is None:
-            self.job.exception = failure
+            self.job.exception = failure.value
 
-        # Fail Fast
         reactor.callFromThread(
             spider.crawler.engine.close_spider,
             spider,
