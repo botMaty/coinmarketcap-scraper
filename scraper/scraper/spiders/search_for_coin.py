@@ -10,9 +10,16 @@ class SearchForCoinSpider(scrapy.Spider):
     def __init__(self, symbol=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.symbol = symbol
+        if not symbol:
+            raise ValueError("symbol is required")
+
+        coin_url = get_url_by_sym(symbol.upper())
+
+        if coin_url is None:
+            raise LookupError(f"Coin '{symbol}' not found")
+
         self.start_urls = [
-            "https://coinmarketcap.com" + get_url_by_sym(self.symbol)
+            "https://coinmarketcap.com" + coin_url
         ]
 
     def start_requests(self):

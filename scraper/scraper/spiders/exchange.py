@@ -9,6 +9,12 @@ class ExchangeSpider(scrapy.Spider):
     def __init__(self, from_coin=None, to_coin=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        if not from_coin:
+            raise ValueError("from_coin is required")
+
+        if not to_coin:
+            raise ValueError("to_coin is required")
+
         self.from_coin = from_coin
         self.to_coin = to_coin
         self.start_urls = [

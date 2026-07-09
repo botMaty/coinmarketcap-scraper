@@ -15,7 +15,14 @@ class Top10PChangeSpider(scrapy.Spider):
 
     def __init__(self, tdomain, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.tdomain_num = tdomain_to_num.get(tdomain, 6)
+
+        if not tdomain:
+            raise ValueError("tdomain is required")
+
+        self.tdomain_num = tdomain_to_num.get(tdomain, None)
+
+        if self.tdomain_num is None:
+            raise ValueError(f"Invalid time domain: '{tdomain}'")
 
         self.start_urls =[
             "https://coinmarketcap.com"

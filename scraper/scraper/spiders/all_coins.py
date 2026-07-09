@@ -12,7 +12,14 @@ class AllCoinsSpider(scrapy.Spider):
     def __init__(self, to_page=81, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.to_page = max(1, int(to_page))
+        try:
+            self.to_page = int(to_page)
+        except (TypeError, ValueError):
+            raise ValueError("to_page must be an integer")
+
+        if self.to_page < 1:
+            raise ValueError("to_page must be greater than 0")
+
         self.start_urls = [
             f"https://coinmarketcap.com/?page={x}"
             for x in range(1, self.to_page + 1)
