@@ -31,11 +31,17 @@ def search_for_coin_fragment():
         key="search_for_coin_btn",
         disabled=st.session_state.search_for_coin_btn_disabled,
     ):
+        try:
+            job = runner().submit(
+                SearchForCoinSpider,
+                symbol=symbol,
+            )
+        except Exception as e:
+            st.session_state.search_for_coin_result = str(e)
+        else:
+            st.session_state.search_for_coin_job = job
+
         st.session_state.search_for_coin_btn_disabled = True
-        st.session_state.search_for_coin_job = runner().submit(
-            SearchForCoinSpider,
-            symbol=symbol,
-        )
         st.rerun(scope="fragment")
 
     if st.session_state.search_for_coin_result is not None:
@@ -47,7 +53,13 @@ def search_for_coin_fragment():
         return
 
     if job.done():
-        st.session_state.search_for_coin_result = job.result()
+        try:
+            res = job.result()
+        except Exception as e:
+            st.session_state.search_for_coin_job = None
+            st.session_state.search_for_coin_result = str(e)
+        else:
+            st.session_state.search_for_coin_result = res
 
         st.session_state.search_for_coin_job = None
         st.session_state.search_for_coin_btn_disabled = False
@@ -64,8 +76,14 @@ def top_10_price_fragment():
         key="top_10_price_btn",
         disabled=st.session_state.top_10_price_btn_disabled,
     ):
+        try:
+            job = runner().submit(Top10PriceSpider)
+        except Exception as e:
+            st.session_state.top_10_price_result = str(e)
+        else:
+            st.session_state.top_10_price_job = job
+
         st.session_state.top_10_price_btn_disabled = True
-        st.session_state.top_10_price_job = runner().submit(Top10PriceSpider)
         st.rerun(scope="fragment")
 
     if st.session_state.top_10_price_result is not None:
@@ -76,7 +94,13 @@ def top_10_price_fragment():
         return
 
     if job.done():
-        st.session_state.top_10_price_result = job.result()
+        try:
+            res = job.result()
+        except Exception as e:
+            st.session_state.top_10_price_job = None
+            st.session_state.top_10_price_result = str(e)
+        else:
+            st.session_state.top_10_price_result = res
 
         st.session_state.top_10_price_job = None
         st.session_state.top_10_price_btn_disabled = False
@@ -98,11 +122,17 @@ def top_10_pchange_fragment():
         key="top_10_pchange_btn",
         disabled=st.session_state.top_10_pchange_btn_disabled,
     ):
+        try:
+            job = runner().submit(
+                Top10PChangeSpider,
+                tdomain=tdomain,
+            )
+        except Exception as e:
+            st.session_state.top_10_pchange_result = str(e)
+        else:
+            st.session_state.top_10_pchange_job = job
+
         st.session_state.top_10_pchange_btn_disabled = True
-        st.session_state.top_10_pchange_job = runner().submit(
-            Top10PChangeSpider,
-            tdomain=tdomain,
-        )
         st.rerun(scope="fragment")
 
     if st.session_state.top_10_pchange_result is not None:
@@ -113,7 +143,13 @@ def top_10_pchange_fragment():
         return
 
     if job.done():
-        st.session_state.top_10_pchange_result = job.result()
+        try:
+            res = job.result()
+        except Exception as e:
+            st.session_state.top_10_pchange_job = None
+            st.session_state.top_10_pchange_result = str(e)
+        else:
+            st.session_state.top_10_pchange_result = res
 
         st.session_state.top_10_pchange_job = None
         st.session_state.top_10_pchange_btn_disabled = False
@@ -136,12 +172,18 @@ def exchange_fragment():
         key="exchange_btn",
         disabled=st.session_state.exchange_btn_disabled,
     ):
+        try:
+            job = runner().submit(
+                ExchangeSpider,
+                from_coin=from_coin,
+                to_coin=to_coin,
+            )
+        except Exception as e:
+            st.session_state.exchange_result = str(e)
+        else:
+            st.session_state.exchange_job = job
+
         st.session_state.exchange_btn_disabled = True
-        st.session_state.exchange_job = runner().submit(
-            ExchangeSpider,
-            from_coin=from_coin,
-            to_coin=to_coin,
-        )
         st.rerun(scope="fragment")
 
     if st.session_state.exchange_result is not None:
@@ -153,7 +195,13 @@ def exchange_fragment():
         return
 
     if job.done():
-        st.session_state.exchange_result = job.result()
+        try:
+            res = job.result()
+        except Exception as e:
+            st.session_state.exchange_job = None
+            st.session_state.exchange_result = str(e)
+        else:
+            st.session_state.exchange_result = res
 
         st.session_state.exchange_job = None
         st.session_state.exchange_btn_disabled = False
