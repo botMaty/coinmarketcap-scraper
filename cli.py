@@ -29,36 +29,53 @@ options = [
 
 def search_for_coin(runner: ScraperRunner):
     symbol = input("Coin symbol: ")
-    coin = runner.submit(
-        SearchForCoinSpider,
-        symbol=symbol
-    )
-    coin.wait()
-    print(coin.result())
+    try:
+        job = runner.submit(
+            SearchForCoinSpider,
+            symbol=symbol
+        )
+        res = job.result()
+    except Exception as e:
+        print(e)
+    else:
+        print(res)
 
 def top_10_by_price(runner: ScraperRunner):
-    coins = runner.submit(Top10PriceSpider)
-    coins.wait()
-    print(coins.result())
+    try:
+        job = runner.submit(Top10PriceSpider)
+        res = job.result()
+    except Exception as e:
+        print(e)
+    else:
+        print(res)
 
 def top_10_by_price_change(runner: ScraperRunner):
     tdomain = input("Time range (1h/24h/7d): ")
-    coins = runner.submit(
-        Top10PChangeSpider,
-        tdomain=tdomain,
-    )
-    print(coins.result())
-
+    try:
+        job = runner.submit(
+            Top10PChangeSpider,
+            tdomain=tdomain,
+        )
+        res = job.result()
+    except Exception as e:
+        print(e)
+    else:
+        print(res)
 
 def exchange(runner: ScraperRunner):
     from_coin = input("From Coin: ")
     to_coin = input("To Coin: ")
-    res = runner.submit(
-        ExchangeSpider,
-        from_coin=from_coin,
-        to_coin=to_coin,
-    )
-    print(res.result())
+    try:
+        job = runner.submit(
+            ExchangeSpider,
+            from_coin=from_coin,
+            to_coin=to_coin,
+        )
+        res = job.result()
+    except Exception as e:
+        print(e)
+    else:
+        print(res)
 
 def menu(options, runner: ScraperRunner):
     while True:
