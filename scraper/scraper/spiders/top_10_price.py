@@ -1,5 +1,4 @@
 import scrapy
-from scrapy_playwright.page import PageMethod
 
 
 class Top10PriceSpider(scrapy.Spider):
@@ -21,7 +20,7 @@ class Top10PriceSpider(scrapy.Spider):
                 "playwright_page_goto_kwargs": {
                     "wait_until": "domcontentloaded",
                 },
-            })
+            }, callback=self.parse)
 
     async def parse(self, response):
         page = response.meta["playwright_page"]

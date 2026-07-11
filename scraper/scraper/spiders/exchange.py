@@ -1,5 +1,4 @@
 import scrapy
-from scrapy_playwright.page import PageMethod
 
 
 class ExchangeSpider(scrapy.Spider):
@@ -29,7 +28,7 @@ class ExchangeSpider(scrapy.Spider):
                 "playwright_page_goto_kwargs": {
                     "wait_until": "networkidle",
                 },
-            })
+            }, callback=self.parse)
 
     async def parse(self, response):
         page = response.meta["playwright_page"]

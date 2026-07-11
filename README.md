@@ -33,6 +33,20 @@ Install the required dependencies:
 pip install -r requirements.txt
 ```
 
+Install a Playwright browser:
+
+```bash
+playwright install <browser>
+```
+
+Available browser names include:
+
+- `chromium`
+- `firefox`
+- `webkit`
+
+> **Note:** If you are in Iran, this command may fail because Playwright downloads are blocked. Use a VPN or proxy before running the command.
+
 ## Running the Project
 
 Run the CLI interface:
@@ -46,22 +60,6 @@ Run the Streamlit interface:
 ```bash
 streamlit run streamlit.py
 ```
-
-## Installing Playwright Browsers
-
-Install a Playwright browser:
-
-```bash
-playwright install <browser>
-```
-
-Available browser names include:
-
-* `chromium`
-* `firefox`
-* `webkit`
-
-If you are in Iran, this command may be blocked due to network restrictions. In that case, use a proxy or VPN.
 
 ## Scrapy Spiders
 

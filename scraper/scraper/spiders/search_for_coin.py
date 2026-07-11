@@ -1,5 +1,4 @@
 import scrapy
-from scrapy_playwright.page import PageMethod
 from scraper.utils.all_coins_inf import get_url_by_sym
 
 
@@ -30,7 +29,7 @@ class SearchForCoinSpider(scrapy.Spider):
                 # "playwright_page_goto_kwargs": {
                 #     "wait_until": "domcontentloaded",
                 # },
-            })
+            }, callback=self.parse)
 
     async def parse(self, response):
         page = response.meta["playwright_page"]

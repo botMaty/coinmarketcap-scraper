@@ -34,7 +34,7 @@ class AllCoinsSpider(scrapy.Spider):
                     PageMethod("evaluate", scrolling_script),
                     PageMethod("wait_for_load_state", "networkidle"),
                 ],
-            })
+            }, callback=self.parse)
 
     async def parse(self, response):
         page = response.meta["playwright_page"]
