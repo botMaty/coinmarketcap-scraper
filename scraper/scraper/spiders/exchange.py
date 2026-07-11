@@ -2,6 +2,8 @@ import scrapy
 
 
 class ExchangeSpider(scrapy.Spider):
+    """Spider that exchange coins."""
+
     name = "exchange"
     allowed_domains = ["coinmarketcap.com"]
 

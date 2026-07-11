@@ -8,6 +8,8 @@ tdomain_to_num = {
 
 
 class Top10PChangeSpider(scrapy.Spider):
+    """Spider that scrap top 10 coins which has more price changes (1h/24h/7d)."""
+
     name = "top_10_pchange"
     allowed_domains = ["coinmarketcap.com"]
 

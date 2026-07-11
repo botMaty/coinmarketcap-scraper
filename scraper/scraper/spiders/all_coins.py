@@ -5,6 +5,8 @@ from scraper.utils.script import scrolling_script
 
 
 class AllCoinsSpider(scrapy.Spider):
+    """Spider that scrap all coins inforamion."""
+
     name = "all_coins"
     allowed_domains = ["coinmarketcap.com"]
 

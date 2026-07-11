@@ -2,6 +2,8 @@ import scrapy
 
 
 class Top10PriceSpider(scrapy.Spider):
+    """Spider that scrap top 10 coins which has more price."""
+
     name = "top_10_price"
     allowed_domains = ["coinmarketcap.com"]
 
