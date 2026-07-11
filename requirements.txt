@@ -3,3 +3,4 @@ scrapy-playwright==0.0.44
 Twisted==25.5.0
 simple-term-menu==1.6.6
 streamlit==1.58.0
+python-dotenv==1.2.2

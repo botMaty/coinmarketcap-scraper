@@ -1,3 +1,16 @@
+from pathlib import Path
+from dotenv import load_dotenv
+import os
+
+# Load .env file
+BASE_DIR = Path(__file__).resolve().parents[2]
+load_dotenv(BASE_DIR / ".env")
+
+# Access environment variables
+playwright_browser_type = os.getenv("PLAYWRIGHT_BROWSER_TYPE")
+playwright_browser_path = os.getenv("PLAYWRIGHT_BROWSER_PATH")
+headless = os.getenv("HEADLESS", "True").lower() == "true"
+
 # Scrapy settings for scraper project
 #
 # For simplicity, this file contains only settings considered important or
@@ -35,6 +48,8 @@ DOWNLOAD_DELAY = 1
 
 # Disable cookies (enabled by default)
 COOKIES_ENABLED = False
+
+LOG_LEVEL = "ERROR"
 
 # Disable Telnet Console (enabled by default)
 #TELNETCONSOLE_ENABLED = False
@@ -102,13 +117,13 @@ DOWNLOAD_HANDLERS = {
 
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 
+PLAYWRIGHT_LAUNCH_OPTIONS = {
+    "headless": headless,
+}
 
-# Optional:
-# PLAYWRIGHT_LAUNCH_OPTIONS = {
-#     "headless": False,
-# } 
-PLAYWRIGHT_BROWSER_TYPE = "chromium"
+if playwright_browser_path:
+    PLAYWRIGHT_LAUNCH_OPTIONS["executable_path"] = playwright_browser_path
+else:
+    PLAYWRIGHT_BROWSER_TYPE = playwright_browser_type
 
 PLAYWRIGHT_DEFAULT_NAVIGATION_TIMEOUT = 10000
-
-LOG_LEVEL = "ERROR"
