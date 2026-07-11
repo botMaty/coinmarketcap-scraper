@@ -34,6 +34,7 @@ def search_for_coin(runner: ScraperRunner):
             SearchForCoinSpider,
             symbol=symbol
         )
+        print("Running...")
         res = job.result()
     except Exception as e:
         print(e)
@@ -43,6 +44,7 @@ def search_for_coin(runner: ScraperRunner):
 def top_10_by_price(runner: ScraperRunner):
     try:
         job = runner.submit(Top10PriceSpider)
+        print("Running...")
         res = job.result()
     except Exception as e:
         print(e)
@@ -56,6 +58,7 @@ def top_10_by_price_change(runner: ScraperRunner):
             Top10PChangeSpider,
             tdomain=tdomain,
         )
+        print("Running...")
         res = job.result()
     except Exception as e:
         print(e)
@@ -71,6 +74,7 @@ def exchange(runner: ScraperRunner):
             from_coin=from_coin,
             to_coin=to_coin,
         )
+        print("Running...")
         res = job.result()
     except Exception as e:
         print(e)
