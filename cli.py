@@ -1,14 +1,12 @@
-from scraper.core.runner import ScraperRunner
-
-from scraper.scraper.spiders.search_for_coin import SearchForCoinSpider
-from scraper.scraper.spiders.top_10_price import Top10PriceSpider
-from scraper.scraper.spiders.top_10_pchange import Top10PChangeSpider
-from scraper.scraper.spiders.exchange import ExchangeSpider
+import time
 
 from simple_term_menu import TerminalMenu
 
-import time
-
+from scraper.core.runner import ScraperRunner
+from scraper.scraper.spiders.exchange import ExchangeSpider
+from scraper.scraper.spiders.search_for_coin import SearchForCoinSpider
+from scraper.scraper.spiders.top_10_pchange import Top10PChangeSpider
+from scraper.scraper.spiders.top_10_price import Top10PriceSpider
 
 banner = """
 ╔══════════════════════════════╗
@@ -23,23 +21,21 @@ options = [
     "Top-10 By Price",
     "Top-10 By Price Change",
     "Exchange",
-    "Quit"
+    "Quit",
 ]
 
 
 def search_for_coin(runner: ScraperRunner):
     symbol = input("Coin symbol: ")
     try:
-        job = runner.submit(
-            SearchForCoinSpider,
-            symbol=symbol
-        )
+        job = runner.submit(SearchForCoinSpider, symbol=symbol)
         print("Running...")
         res = job.result()
     except Exception as e:
         print(e)
     else:
         print(res)
+
 
 def top_10_by_price(runner: ScraperRunner):
     try:
@@ -50,6 +46,7 @@ def top_10_by_price(runner: ScraperRunner):
         print(e)
     else:
         print(res)
+
 
 def top_10_by_price_change(runner: ScraperRunner):
     tdomain = input("Time range (1h/24h/7d): ")
@@ -64,6 +61,7 @@ def top_10_by_price_change(runner: ScraperRunner):
         print(e)
     else:
         print(res)
+
 
 def exchange(runner: ScraperRunner):
     from_coin = input("From Coin: ")
@@ -80,6 +78,7 @@ def exchange(runner: ScraperRunner):
         print(e)
     else:
         print(res)
+
 
 def menu(options, runner: ScraperRunner):
     while True:
@@ -99,11 +98,13 @@ def menu(options, runner: ScraperRunner):
         # TerminalMenu(["Press Enter..."]).show()
         input("Press Enter...")
 
+
 def show_banner(banner: str):
     for char in banner:
-        print(char, end='', flush=True)
+        print(char, end="", flush=True)
         if char.isalpha():
             time.sleep(0.05)
+
 
 def main():
     global banner
@@ -114,6 +115,7 @@ def main():
     show_banner(banner)
     menu(options, runner)
     runner.shutdown
+
 
 if __name__ == "__main__":
     main()

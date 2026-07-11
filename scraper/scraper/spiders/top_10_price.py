@@ -8,19 +8,21 @@ class Top10PriceSpider(scrapy.Spider):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.start_urls =[
-            "https://coinmarketcap.com"
-        ]
+        self.start_urls = ["https://coinmarketcap.com"]
 
     async def start(self):
         for url in self.start_urls:
-            yield scrapy.Request(url, meta={
-                "playwright": True,
-                "playwright_include_page": True,
-                "playwright_page_goto_kwargs": {
-                    "wait_until": "domcontentloaded",
+            yield scrapy.Request(
+                url,
+                meta={
+                    "playwright": True,
+                    "playwright_include_page": True,
+                    "playwright_page_goto_kwargs": {
+                        "wait_until": "domcontentloaded",
+                    },
                 },
-            }, callback=self.parse)
+                callback=self.parse,
+            )
 
     async def parse(self, response):
         page = response.meta["playwright_page"]
@@ -47,10 +49,14 @@ class Top10PriceSpider(scrapy.Spider):
 
         response = response.replace(body=html)
 
-        for cursor in response.css('table.cmc-table tbody:nth-of-type(1) tr')[:10]:
+        for cursor in response.css("table.cmc-table tbody:nth-of-type(1) tr")[:10]:
             yield {
-                "Name": cursor.css("p.coin-item-name::text, a span:nth-child(2)::text").get(),
-                "Symbol": cursor.css("p.coin-item-symbol::text, span.crypto-symbol::text").get(),
+                "Name": cursor.css(
+                    "p.coin-item-name::text, a span:nth-child(2)::text"
+                ).get(),
+                "Symbol": cursor.css(
+                    "p.coin-item-symbol::text, span.crypto-symbol::text"
+                ).get(),
                 "Price": cursor.css("td:nth-child(4) span::text").get(),
             }
 

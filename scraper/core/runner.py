@@ -4,17 +4,15 @@ install_reactor("twisted.internet.asyncioreactor.AsyncioSelectorReactor")
 
 import threading
 
-from twisted.internet import reactor
-
 from scrapy.crawler import CrawlerRunner
 from scrapy.settings import Settings
+from twisted.internet import reactor
 
 from scraper.scraper import settings as project_settings
 
 from .collectors import ListCollector
-from .signals import connect
 from .job import CrawlJob
-
+from .signals import connect
 
 settings = Settings()
 settings.setmodule(project_settings)

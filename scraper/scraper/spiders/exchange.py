@@ -16,19 +16,21 @@ class ExchangeSpider(scrapy.Spider):
 
         self.from_coin = from_coin
         self.to_coin = to_coin
-        self.start_urls = [
-            "https://coinmarketcap.com/converter/"
-        ]
+        self.start_urls = ["https://coinmarketcap.com/converter/"]
 
     async def start(self):
         for url in self.start_urls:
-            yield scrapy.Request(url, meta={
-                "playwright": True,
-                "playwright_include_page": True,
-                "playwright_page_goto_kwargs": {
-                    "wait_until": "networkidle",
+            yield scrapy.Request(
+                url,
+                meta={
+                    "playwright": True,
+                    "playwright_include_page": True,
+                    "playwright_page_goto_kwargs": {
+                        "wait_until": "networkidle",
+                    },
                 },
-            }, callback=self.parse)
+                callback=self.parse,
+            )
 
     async def parse(self, response):
         page = response.meta["playwright_page"]
@@ -41,7 +43,9 @@ class ExchangeSpider(scrapy.Spider):
         await inp.wait_for()
         await inp.fill(self.from_coin)
 
-        loc = page.locator('div.cmc-body-wrapper div.cmc-select__group div.cmc-select__option').nth(0)
+        loc = page.locator(
+            "div.cmc-body-wrapper div.cmc-select__group div.cmc-select__option"
+        ).nth(0)
         await loc.wait_for()
         await loc.click()
 
@@ -49,23 +53,37 @@ class ExchangeSpider(scrapy.Spider):
         await inp.wait_for()
         await inp.fill(self.to_coin)
 
-        loc = page.locator('div.cmc-body-wrapper div.cmc-select__group div.cmc-select__option').nth(0)
+        loc = page.locator(
+            "div.cmc-body-wrapper div.cmc-select__group div.cmc-select__option"
+        ).nth(0)
         await loc.wait_for()
         await loc.click()
 
-        await page.locator('em.cmc-converter__conversion-result').nth(0).wait_for()
+        await page.locator("em.cmc-converter__conversion-result").nth(0).wait_for()
 
         html = await page.content()
 
         response = response.replace(body=html)
 
-        from_coin_res = " ".join(t.strip() for t in response.css(
-            "div.cmc-converter div.converter__text-row div::text"
-            ).getall()[:2] if t.strip())
+        from_coin_res = " ".join(
+            t.strip()
+            for t in response.css(
+                "div.cmc-converter div.converter__text-row div::text"
+            ).getall()[:2]
+            if t.strip()
+        )
 
         yield {
             "FromCoin": from_coin_res,
-            "ToCoin": (response.css("em.cmc-converter__conversion-result::text").get() or "") + (response.css("div.cmc-converter div.converter__text-row div + div + div::text").get() or ""),
+            "ToCoin": (
+                response.css("em.cmc-converter__conversion-result::text").get() or ""
+            )
+            + (
+                response.css(
+                    "div.cmc-converter div.converter__text-row div + div + div::text"
+                ).get()
+                or ""
+            ),
         }
-        
+
         await page.close()

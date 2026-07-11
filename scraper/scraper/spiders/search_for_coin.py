@@ -1,4 +1,5 @@
 import scrapy
+
 from scraper.utils.all_coins_inf import get_url_by_sym
 
 
