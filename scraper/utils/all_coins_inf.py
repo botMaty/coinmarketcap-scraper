@@ -14,6 +14,8 @@ def get_url_by_sym(sym: str) -> str:
         str: url path for given symbol
     """
 
+    sym = sym.upper()
+
     with DATA_FILE.open(newline="", encoding="utf-8") as csvfile:
         reader = csv.reader(csvfile)
         next(reader, None)

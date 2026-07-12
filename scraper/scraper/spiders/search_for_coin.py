@@ -15,7 +15,7 @@ class SearchForCoinSpider(scrapy.Spider):
         if not symbol:
             raise ValueError("symbol is required")
 
-        coin_url = get_url_by_sym(symbol.upper())
+        coin_url = get_url_by_sym(symbol)
 
         if coin_url is None:
             raise LookupError(f"Coin '{symbol}' not found")

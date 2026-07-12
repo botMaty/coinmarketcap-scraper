@@ -1,4 +1,5 @@
 import streamlit as st
+
 from scraper.core.runner import ScraperRunner
 from scraper.scraper.spiders.exchange import ExchangeSpider
 from scraper.scraper.spiders.search_for_coin import SearchForCoinSpider

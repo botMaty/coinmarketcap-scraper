@@ -175,6 +175,8 @@ Converts one cryptocurrency to another.
 
 ## Additional Documentation
 
+The following documentation files are available in the `additional/` directory:
+
 ### `CORE.md`
 
 Contains usage instructions and explanations for the files inside the `scraper/core/` directory.
