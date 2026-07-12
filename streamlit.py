@@ -1,11 +1,10 @@
 import streamlit as st
-
 from scraper.core.runner import ScraperRunner
 from scraper.scraper.spiders.exchange import ExchangeSpider
 from scraper.scraper.spiders.search_for_coin import SearchForCoinSpider
 from scraper.scraper.spiders.top_10_pchange import Top10PChangeSpider
 from scraper.scraper.spiders.top_10_price import Top10PriceSpider
-from scraper.utils.all_coins_inf import get_all_coins_sym
+from scraper.utils.all_coins_inf import get_all_coins_symbol
 
 
 @st.cache_resource
@@ -212,7 +211,7 @@ def exchange_fragment():
 
 
 if "coins_sym" not in st.session_state:
-    st.session_state.coins_sym = tuple(get_all_coins_sym())
+    st.session_state.coins_sym = tuple(get_all_coins_symbol())
 
 if "search_for_coin_btn_disabled" not in st.session_state:
     st.session_state.search_for_coin_btn_disabled = False

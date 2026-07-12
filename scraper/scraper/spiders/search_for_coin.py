@@ -1,6 +1,6 @@
 import scrapy
 
-from scraper.utils.all_coins_inf import get_url_by_sym
+from scraper.utils.all_coins_inf import get_url_by_symbol
 
 
 class SearchForCoinSpider(scrapy.Spider):
@@ -15,7 +15,7 @@ class SearchForCoinSpider(scrapy.Spider):
         if not symbol:
             raise ValueError("symbol is required")
 
-        coin_url = get_url_by_sym(symbol)
+        coin_url = get_url_by_symbol(symbol)
 
         if coin_url is None:
             raise LookupError(f"Coin '{symbol}' not found")
@@ -43,12 +43,17 @@ class SearchForCoinSpider(scrapy.Spider):
 
         await page.locator('span[data-test="text-cdp-price-display"]').nth(0).wait_for()
 
-        response = response.replace(body=html)
+        response = response.replace(
+            body=html.encode("utf-8"),
+            encoding="utf-8",
+        )
 
         yield {
-            "Name": response.css('span[data-role="coin-name"]::text').get(),
-            "Price": response.css(
-                'span[data-test="text-cdp-price-display"]::text'
-            ).get(),
+            "Name": response.css('span[data-role="coin-name"]::text')
+            .get(default="")
+            .strip(),
+            "Price": response.css('span[data-test="text-cdp-price-display"]::text')
+            .get(default="")
+            .strip(),
         }
         await page.close()

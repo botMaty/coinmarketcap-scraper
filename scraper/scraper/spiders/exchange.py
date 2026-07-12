@@ -10,10 +10,16 @@ class ExchangeSpider(scrapy.Spider):
     def __init__(self, from_coin=None, to_coin=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if not from_coin:
+        if not isinstance(from_coin, str):
+            raise TypeError("from_coin must be a string")
+
+        if not isinstance(to_coin, str):
+            raise TypeError("to_coin must be a string")
+
+        if not from_coin.strip():
             raise ValueError("from_coin is required")
 
-        if not to_coin:
+        if not to_coin.strip():
             raise ValueError("to_coin is required")
 
         self.from_coin = from_coin
@@ -65,7 +71,10 @@ class ExchangeSpider(scrapy.Spider):
 
         html = await page.content()
 
-        response = response.replace(body=html)
+        response = response.replace(
+            body=html.encode("utf-8"),
+            encoding="utf-8",
+        )
 
         from_coin_res = " ".join(
             t.strip()
@@ -78,13 +87,16 @@ class ExchangeSpider(scrapy.Spider):
         yield {
             "FromCoin": from_coin_res,
             "ToCoin": (
-                response.css("em.cmc-converter__conversion-result::text").get() or ""
+                response.css("em.cmc-converter__conversion-result::text")
+                .get(default="")
+                .strip()
             )
             + (
                 response.css(
                     "div.cmc-converter div.converter__text-row div + div + div::text"
-                ).get()
-                or ""
+                )
+                .get(default="")
+                .strip()
             ),
         }
 

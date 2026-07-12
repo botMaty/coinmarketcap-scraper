@@ -63,20 +63,29 @@ class Top10PChangeSpider(scrapy.Spider):
 
         html = await page.content()
 
-        response = response.replace(body=html)
+        response = response.replace(
+            body=html.encode("utf-8"),
+            encoding="utf-8",
+        )
 
         for cursor in response.css("table.cmc-table tbody:nth-of-type(1) tr")[:10]:
             yield {
-                "Name": cursor.css(
-                    "p.coin-item-name::text, a span:nth-child(2)::text"
-                ).get(),
+                "Name": cursor.css("p.coin-item-name::text, a span:nth-child(2)::text")
+                .get(default="")
+                .strip(),
                 "Symbol": cursor.css(
                     "p.coin-item-symbol::text, span.crypto-symbol::text"
-                ).get(),
-                "Price": cursor.css("td:nth-child(4) span::text").get(),
+                )
+                .get(default="")
+                .strip(),
+                "Price": cursor.css("td:nth-child(4) span::text")
+                .get(default="")
+                .strip(),
                 "Price_Change": cursor.css(
                     f"td:nth-child({self.tdomain_num}) span::text"
-                ).get(),
+                )
+                .get(default="")
+                .strip(),
             }
 
         await page.close()
