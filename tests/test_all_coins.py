@@ -55,7 +55,7 @@ async def test_parse(mocker):
 
     response.meta["playwright_page"] = page
 
-    spider = AllCoinsSpider()
+    spider = AllCoinsSpider(to_page=1)
 
     items = [item async for item in spider.parse(response)]
 

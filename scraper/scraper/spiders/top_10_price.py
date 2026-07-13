@@ -29,44 +29,48 @@ class Top10PriceSpider(scrapy.Spider):
     async def parse(self, response):
         page = response.meta["playwright_page"]
 
-        btn = page.get_by_role("button", name="Filters")
-        await btn.wait_for()
-        await btn.click()
+        try:
+            btn = page.get_by_role("button", name="Filters")
+            await btn.wait_for()
+            await btn.click()
 
-        loc = page.locator("div.form-item").nth(0)
-        await loc.wait_for()
-        await loc.locator('div[data-role="select-trigger"]').click()
+            loc = page.locator("div.form-item").nth(0)
+            await loc.wait_for()
+            await loc.locator('div[data-role="select-trigger"]').click()
 
-        loc = page.locator('div[data-role="pp-item"] > div > div').nth(3)
-        await loc.wait_for()
-        await loc.click()
+            loc = page.locator('div[data-role="pp-item"] > div > div').nth(3)
+            await loc.wait_for()
+            await loc.click()
 
-        await page.get_by_role("button", name="Apply").click()
+            await page.get_by_role("button", name="Apply").click()
 
-        await page.locator("th.stickyTop").nth(3).click()
+            await page.locator("th.stickyTop").nth(3).click()
 
-        await page.wait_for_timeout(2000)
+            await page.wait_for_timeout(2000)
 
-        html = await page.content()
+            html = await page.content()
 
-        response = response.replace(
-            body=html.encode("utf-8"),
-            encoding="utf-8",
-        )
+            response = response.replace(
+                body=html.encode("utf-8"),
+                encoding="utf-8",
+            )
 
-        for cursor in response.css("table.cmc-table tbody:nth-of-type(1) tr")[:10]:
-            yield {
-                "Name": cursor.css("p.coin-item-name::text, a span:nth-child(2)::text")
-                .get(default="")
-                .strip(),
-                "Symbol": cursor.css(
-                    "p.coin-item-symbol::text, span.crypto-symbol::text"
-                )
-                .get(default="")
-                .strip(),
-                "Price": cursor.css("td:nth-child(4) span::text")
-                .get(default="")
-                .strip(),
-            }
+            for cursor in response.css("table.cmc-table tbody:nth-of-type(1) tr")[:10]:
+                yield {
+                    "name": cursor.css(
+                        "p.coin-item-name::text, a span:nth-child(2)::text"
+                    )
+                    .get(default="")
+                    .strip(),
+                    "symbol": cursor.css(
+                        "p.coin-item-symbol::text, span.crypto-symbol::text"
+                    )
+                    .get(default="")
+                    .strip(),
+                    "price": cursor.css("td:nth-child(4) span::text")
+                    .get(default="")
+                    .strip(),
+                }
 
-        await page.close()
+        finally:
+            await page.close()

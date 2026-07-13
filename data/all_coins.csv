@@ -1,4 +1,4 @@
-Name,Symbol,web_path
+name,symbol,web_path
 CoinMarketCap 20 Index DTF,CMC20,/currencies/coinmarketcap-20-index/
 Bitcoin,BTC,/currencies/bitcoin/
 Ethereum,ETH,/currencies/ethereum/

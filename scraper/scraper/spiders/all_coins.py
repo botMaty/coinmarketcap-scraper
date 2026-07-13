@@ -43,24 +43,28 @@ class AllCoinsSpider(scrapy.Spider):
     async def parse(self, response):
         page = response.meta["playwright_page"]
 
-        html = await page.content()
+        try:
+            html = await page.content()
 
-        response = response.replace(
-            body=html.encode("utf-8"),
-            encoding="utf-8",
-        )
+            response = response.replace(
+                body=html.encode("utf-8"),
+                encoding="utf-8",
+            )
 
-        for cursor in response.css("table.cmc-table tbody:nth-of-type(1) tr"):
-            yield {
-                "Name": cursor.css("p.coin-item-name::text, a span:nth-child(2)::text")
-                .get(default="")
-                .strip(),
-                "Symbol": cursor.css(
-                    "p.coin-item-symbol::text, span.crypto-symbol::text"
-                )
-                .get(default="")
-                .strip(),
-                "web_path": cursor.css("a::attr(href)").get(default="").strip(),
-            }
+            for cursor in response.css("table.cmc-table tbody:nth-of-type(1) tr"):
+                yield {
+                    "Name": cursor.css(
+                        "p.coin-item-name::text, a span:nth-child(2)::text"
+                    )
+                    .get(default="")
+                    .strip(),
+                    "Symbol": cursor.css(
+                        "p.coin-item-symbol::text, span.crypto-symbol::text"
+                    )
+                    .get(default="")
+                    .strip(),
+                    "web_path": cursor.css("a::attr(href)").get(default="").strip(),
+                }
 
-        await page.close()
+        finally:
+            await page.close()

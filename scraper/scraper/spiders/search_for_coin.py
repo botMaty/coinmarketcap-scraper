@@ -39,21 +39,25 @@ class SearchForCoinSpider(scrapy.Spider):
     async def parse(self, response):
         page = response.meta["playwright_page"]
 
-        html = await page.content()
+        try:
+            html = await page.content()
 
-        await page.locator('span[data-test="text-cdp-price-display"]').nth(0).wait_for()
+            await page.locator('span[data-test="text-cdp-price-display"]').nth(
+                0
+            ).wait_for()
 
-        response = response.replace(
-            body=html.encode("utf-8"),
-            encoding="utf-8",
-        )
+            response = response.replace(
+                body=html.encode("utf-8"),
+                encoding="utf-8",
+            )
 
-        yield {
-            "Name": response.css('span[data-role="coin-name"]::text')
-            .get(default="")
-            .strip(),
-            "Price": response.css('span[data-test="text-cdp-price-display"]::text')
-            .get(default="")
-            .strip(),
-        }
-        await page.close()
+            yield {
+                "name": response.css('span[data-role="coin-name"]::text')
+                .get(default="")
+                .strip(),
+                "price": response.css('span[data-test="text-cdp-price-display"]::text')
+                .get(default="")
+                .strip(),
+            }
+        finally:
+            await page.close()

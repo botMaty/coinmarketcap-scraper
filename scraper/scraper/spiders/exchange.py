@@ -43,61 +43,81 @@ class ExchangeSpider(scrapy.Spider):
     async def parse(self, response):
         page = response.meta["playwright_page"]
 
-        inp = page.locator('div.cmc-body-wrapper input[type="number"]')
-        await inp.wait_for()
-        await inp.fill("1")
+        try:
+            inp = page.locator('div.cmc-body-wrapper input[type="number"]')
+            await inp.wait_for()
+            await inp.fill("1")
 
-        inp = page.locator("#react-select-cmc-select__from-input")
-        await inp.wait_for()
-        await inp.fill(self.from_coin)
+            inp = page.locator("#react-select-cmc-select__from-input")
+            await inp.wait_for()
+            await inp.fill(self.from_coin)
 
-        loc = page.locator(
-            "div.cmc-body-wrapper div.cmc-select__group div.cmc-select__option"
-        ).nth(0)
-        await loc.wait_for()
-        await loc.click()
+            no_options = page.locator("div.cmc-select__menu-notice--no-options")
+            if await no_options.is_visible():
+                raise ValueError(f"Coin '{self.from_coin}' not found.")
 
-        inp = page.locator("#react-select-cmc-select__to-input")
-        await inp.wait_for()
-        await inp.fill(self.to_coin)
+            loc = page.locator(
+                "div.cmc-body-wrapper div.cmc-select__group div.cmc-select__option"
+            ).nth(0)
+            await loc.wait_for()
+            await loc.click()
 
-        loc = page.locator(
-            "div.cmc-body-wrapper div.cmc-select__group div.cmc-select__option"
-        ).nth(0)
-        await loc.wait_for()
-        await loc.click()
+            inp = page.locator("#react-select-cmc-select__to-input")
+            await inp.wait_for()
+            await inp.fill(self.to_coin)
 
-        await page.locator("em.cmc-converter__conversion-result").nth(0).wait_for()
+            no_options = page.locator("div.cmc-select__menu-notice--no-options")
+            if await no_options.is_visible():
+                raise ValueError(f"Coin '{self.to_coin}' not found.")
 
-        html = await page.content()
+            loc = page.locator(
+                "div.cmc-body-wrapper div.cmc-select__group div.cmc-select__option"
+            ).nth(0)
+            await loc.wait_for()
+            await loc.click()
 
-        response = response.replace(
-            body=html.encode("utf-8"),
-            encoding="utf-8",
-        )
+            await page.locator("em.cmc-converter__conversion-result").nth(0).wait_for()
 
-        from_coin_res = " ".join(
-            t.strip()
-            for t in response.css(
-                "div.cmc-converter div.converter__text-row div::text"
-            ).getall()[:2]
-            if t.strip()
-        )
+            html = await page.content()
 
-        yield {
-            "FromCoin": from_coin_res,
-            "ToCoin": (
+            response = response.replace(
+                body=html.encode("utf-8"),
+                encoding="utf-8",
+            )
+
+            texts = [
+                t.strip()
+                for t in response.css(
+                    "div.cmc-converter > div.converter__text-row > div.cmc-converter__text:nth-of-type(1)::text"
+                ).getall()
+                if t.strip()
+            ]
+
+            if len(texts) != 2:
+                raise ValueError(f"Failed to parse from_coin for '{self.from_coin}'.")
+
+            from_amount, from_name = texts
+
+            texts = [
                 response.css("em.cmc-converter__conversion-result::text")
                 .get(default="")
-                .strip()
-            )
-            + (
+                .strip(),
                 response.css(
-                    "div.cmc-converter div.converter__text-row div + div + div::text"
+                    "div.cmc-converter > div.converter__text-row div + div + div::text"
                 )
                 .get(default="")
-                .strip()
-            ),
-        }
+                .strip(),
+            ]
 
-        await page.close()
+            if not texts[0] or not texts[1]:
+                raise ValueError(f"Failed to parse to_coin for '{self.to_coin}'.")
+
+            to_amount, to_name = texts
+
+            yield {
+                "from_coin": {"amount": from_amount, "name": from_name},
+                "to_coin": {"amount": to_amount, "name": to_name},
+            }
+
+        finally:
+            await page.close()
