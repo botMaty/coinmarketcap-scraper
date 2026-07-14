@@ -184,3 +184,7 @@ Contains usage instructions and explanations for the files inside the `scraper/c
 ### `PLAYWRIGHT_USING_GUIDE.md`
 
 Provides guidelines and best practices for using Playwright inside Scrapy spiders.
+
+### `PYTEST_GUIDE.md`
+
+Provides instructions and best practices for writing, running, and maintaining pytest-based tests, including async testing, Playwright mocking, test structure, exception handling, and utility testing.
