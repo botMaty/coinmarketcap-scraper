@@ -39,7 +39,7 @@ async def test_start():
 @pytest.mark.asyncio
 async def test_parse(mocker):
 
-    html = Path("data/all_coins.html").read_text(encoding="utf-8")
+    html = Path("tests/data/all_coins.html").read_text(encoding="utf-8")
 
     page = mocker.Mock()
     page.content = AsyncMock(return_value=html)

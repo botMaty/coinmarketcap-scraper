@@ -58,7 +58,7 @@ async def test_start():
 
 
 def make_page_response(mocker):
-    html = Path("data/exchange.html").read_text(encoding="utf-8")
+    html = Path("tests/data/exchange.html").read_text(encoding="utf-8")
 
     page = mocker.Mock()
     page.content = AsyncMock(return_value=html)
