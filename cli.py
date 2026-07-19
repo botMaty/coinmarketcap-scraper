@@ -114,7 +114,7 @@ def main():
 
     show_banner(banner)
     menu(options, runner)
-    runner.shutdown
+    runner.shutdown()
 
 
 if __name__ == "__main__":
